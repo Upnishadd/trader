@@ -1,21 +1,23 @@
 """
 Dashboard API Server
 Serves the web dashboard and exposes REST endpoints for bot status/control.
+Now with WebSocket support for real-time updates.
 """
 
 import os
 import json
 import logging
-import threading
-from datetime import datetime, timezone, timedelta
+from datetime import datetime
 
 from flask import Flask, jsonify, send_from_directory, request
 from flask_cors import CORS
+from flask_socketio import SocketIO
 
 logger = logging.getLogger("DashboardAPI")
 
 app = Flask(__name__, static_folder="/app/dashboard/static")
 CORS(app)
+socketio = SocketIO(app, cors_allowed_origins="*")  # <-- enable WebSockets
 
 bot_instance = None  # Set by main.py
 
@@ -85,6 +87,19 @@ def close_position():
     return jsonify({"status": "no position"})
 
 
+# ---------- WebSocket events ----------
+@socketio.on("connect")
+def handle_connect():
+    logger.info("WebSocket client connected")
+    if bot_instance:
+        socketio.emit("status_update", bot_instance.get_status())
+
+
+def emit_signal(signal: dict):
+    """Call this in your bot whenever a new trade signal is generated"""
+    socketio.emit("signal", signal)
+
+
 def run_server(host="0.0.0.0", port=8080):
     logger.info(f"Dashboard server starting on {host}:{port}")
-    app.run(host=host, port=port, debug=False, use_reloader=False)
+    socketio.run(app, host=host, port=port, debug=False)
