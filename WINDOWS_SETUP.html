@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kronos Bot — Windows Setup Guide</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=DM+Sans:wght@400;500;600;700&display=swap');
+
+  :root {
+    --bg: #0f1117;
+    --surface: #161b22;
+    --surface2: #1c2333;
+    --border: #30363d;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --yellow: #d29922;
+    --red: #f85149;
+    --purple: #bc8cff;
+    --text: #e6edf3;
+    --muted: #7d8590;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'DM Sans', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    line-height: 1.7;
+    padding: 40px 20px 80px;
+  }
+
+  .container {
+    max-width: 780px;
+    margin: 0 auto;
+  }
+
+  /* Header */
+  .guide-header {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 28px;
+    margin-bottom: 40px;
+  }
+
+  .guide-tag {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    background: rgba(88,166,255,0.1);
+    border: 1px solid rgba(88,166,255,0.2);
+    padding: 4px 12px;
+    border-radius: 100px;
+    margin-bottom: 16px;
+  }
+
+  h1 {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.2;
+    margin-bottom: 10px;
+  }
+
+  .guide-subtitle {
+    color: var(--muted);
+    font-size: 15px;
+  }
+
+  /* Steps */
+  .step {
+    margin-bottom: 40px;
+    position: relative;
+  }
+
+  .step-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .step-num {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--surface2);
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-top: 2px;
+  }
+
+  .step-num.done {
+    background: rgba(63,185,80,0.15);
+    border-color: var(--green);
+    color: var(--green);
+  }
+
+  .step-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .step-desc {
+    font-size: 14px;
+    color: var(--muted);
+  }
+
+  .step-body {
+    margin-left: 52px;
+  }
+
+  p {
+    font-size: 14px;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+
+  /* Code blocks */
+  .code-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 12px 0;
+  }
+
+  .code-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 14px;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+  }
+
+  .copy-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 2px 10px;
+    border-radius: 4px;
+    font-family: var(--mono);
+    font-size: 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .copy-btn:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .copy-btn.copied {
+    color: var(--green);
+    border-color: var(--green);
+  }
+
+  pre {
+    padding: 16px;
+    overflow-x: auto;
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text);
+  }
+
+  .c-comment { color: var(--muted); }
+  .c-cmd { color: var(--accent); }
+  .c-string { color: var(--green); }
+  .c-key { color: var(--purple); }
+
+  /* Alert boxes */
+  .alert {
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin: 14px 0;
+    font-size: 13px;
+    border-left: 3px solid;
+    display: flex;
+    gap: 10px;
+  }
+
+  .alert-warn {
+    background: rgba(210,153,34,0.08);
+    border-color: var(--yellow);
+    color: #c9a227;
+  }
+
+  .alert-info {
+    background: rgba(88,166,255,0.08);
+    border-color: var(--accent);
+    color: #79b8ff;
+  }
+
+  .alert-success {
+    background: rgba(63,185,80,0.08);
+    border-color: var(--green);
+    color: #56d364;
+  }
+
+  .alert-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+  .alert-body { line-height: 1.5; }
+  .alert-body strong { font-weight: 700; display: block; margin-bottom: 3px; }
+
+  /* BIOS table */
+  .bios-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 13px;
+  }
+
+  .bios-table th {
+    text-align: left;
+    padding: 8px 12px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+  }
+
+  .bios-table td {
+    padding: 9px 12px;
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 12px;
+  }
+
+  .bios-table tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+
+  .path-arrow { color: var(--muted); margin: 0 4px; }
+
+  /* Checklist */
+  .checklist {
+    list-style: none;
+    margin: 12px 0;
+  }
+
+  .checklist li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(48,54,61,0.5);
+    font-size: 13px;
+    color: var(--text);
+  }
+
+  .checklist li:last-child { border-bottom: none; }
+
+  .check-box {
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--border);
+    border-radius: 4px;
+    flex-shrink: 0;
+    margin-top: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+  }
+
+  .check-box:hover { border-color: var(--accent); }
+  .check-box.checked { background: var(--green); border-color: var(--green); color: #000; }
+
+  /* Progress bar */
+  .progress-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .progress-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .progress-bar-bg {
+    flex: 1;
+    height: 6px;
+    background: var(--surface2);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--purple));
+    border-radius: 3px;
+    width: 0%;
+    transition: width 0.4s ease;
+  }
+
+  .progress-pct {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent);
+    min-width: 36px;
+    text-align: right;
+  }
+
+  /* Divider */
+  hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 32px 0;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="guide-header">
+    <div class="guide-tag">Setup Guide</div>
+    <h1>Kronos Bot on Windows<br>RTX 4060 Ti + WSL2</h1>
+    <p class="guide-subtitle">AMD A520 · 32GB RAM · RTX 4060 Ti 8GB · WSL2 + Docker Desktop</p>
+  </div>
+
+  <!-- Progress -->
+  <div class="progress-wrap">
+    <span class="progress-label">Progress</span>
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progress-fill"></div>
+    </div>
+    <span class="progress-pct" id="progress-pct">0%</span>
+  </div>
+
+  <!-- ── STEP 1 ── -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num" id="sn-1">1</div>
+      <div>
+        <div class="step-title">Enable Windows Features</div>
+        <div class="step-desc">Run two commands in PowerShell as Administrator</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>Press <strong>Windows key</strong>, type <code>PowerShell</code>, right-click → <strong>Run as Administrator</strong>. Then run both commands:</p>
+
+      <div class="code-block">
+        <div class="code-label">PowerShell (Admin) <button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <pre>dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
+
+dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart</pre>
+      </div>
+
+      <div class="alert alert-warn">
+        <span class="alert-icon">⚠️</span>
+        <div class="alert-body">
+          <strong>Restart your PC after both commands complete.</strong>
+          Do not skip the restart — the features won't activate without it.
+        </div>
+      </div>
+
+      <ul class="checklist">
+        <li><div class="check-box" onclick="toggleCheck(this, 1)"></div> Ran both dism commands successfully</li>
+        <li><div class="check-box" onclick="toggleCheck(this, 1)"></div> Restarted PC</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ── STEP 2 ── -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num" id="sn-2">2</div>
+      <div>
+        <div class="step-title">Enable SVM in BIOS</div>
+        <div class="step-desc">Turn on AMD virtualization — required for WSL2</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>Restart your PC and press <strong>Delete</strong> repeatedly as soon as it powers on to enter BIOS. (Some A520 boards use F2 — try Delete first.)</p>
+
+      <p>Once in BIOS, find the SVM setting using this table:</p>
+
+      <table class="bios-table">
+        <tr>
+          <th>Brand</th>
+          <th>Path to SVM / Virtualization</th>
+        </tr>
+        <tr>
+          <td>Gigabyte</td>
+          <td>MIT <span class="path-arrow">→</span> Advanced Frequency Settings <span class="path-arrow">→</span> Advanced CPU Settings <span class="path-arrow">→</span> <strong>SVM Mode → Enabled</strong></td>
+        </tr>
+        <tr>
+          <td>MSI</td>
+          <td>OC <span class="path-arrow">→</span> CPU Features <span class="path-arrow">→</span> <strong>SVM Mode → Enabled</strong></td>
+        </tr>
+        <tr>
+          <td>ASRock</td>
+          <td>Advanced <span class="path-arrow">→</span> CPU Configuration <span class="path-arrow">→</span> <strong>SVM Mode → Enabled</strong></td>
+        </tr>
+        <tr>
+          <td>ASUS</td>
+          <td>Advanced Mode (F7) <span class="path-arrow">→</span> Advanced <span class="path-arrow">→</span> CPU Configuration <span class="path-arrow">→</span> <strong>SVM Mode → Enabled</strong></td>
+        </tr>
+        <tr>
+          <td>Not sure</td>
+          <td>Press <strong>F6</strong> or look for a search bar, type <strong>SVM</strong> or <strong>Virtualization</strong></td>
+        </tr>
+      </table>
+
+      <p>Press <strong>F10</strong> to Save & Exit, then let Windows boot normally.</p>
+
+      <ul class="checklist">
+        <li><div class="check-box" onclick="toggleCheck(this, 2)"></div> Entered BIOS (Delete key on boot)</li>
+        <li><div class="check-box" onclick="toggleCheck(this, 2)"></div> Found and set SVM Mode → Enabled</li>
+        <li><div class="check-box" onclick="toggleCheck(this, 2)"></div> Saved with F10 and booted back into Windows</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ── STEP 3 ── -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num" id="sn-3">3</div>
+      <div>
+        <div class="step-title">Install WSL2 + Ubuntu</div>
+        <div class="step-desc">Now that virtualization is on, WSL2 will install cleanly</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>Open PowerShell as Administrator again and run:</p>
+
+      <div class="code-block">
+        <div class="code-label">PowerShell (Admin) <button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <pre>wsl --install</pre>
+      </div>
+
+      <p>This downloads and installs Ubuntu automatically. When it finishes it will ask you to <strong>restart again</strong>. Do so.</p>
+
+      <p>After the restart, Ubuntu will open and ask you to create a username and password. Pick something simple — you'll use it occasionally.</p>
+
+      <div class="alert alert-info">
+        <span class="alert-icon">💡</span>
+        <div class="alert-body">
+          <strong>Verify it worked</strong>
+          In PowerShell run: <code>wsl --status</code> — you should see "Default Version: 2" with no errors this time.
+        </div>
+      </div>
+
+      <ul class="checklist">
+        <li><div class="check-box" onclick="toggleCheck(this, 3)"></div> <code>wsl --install</code> ran without errors</li>
+        <li><div class="check-box" onclick="toggleCheck(this, 3)"></div> Created Ubuntu username + password</li>
+        <li><div class="check-box" onclick="toggleCheck(this, 3)"></div> <code>wsl --status</code> shows Default Version: 2, no errors</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ── STEP 4 ── -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num" id="sn-4">4</div>
+      <div>
+        <div class="step-title">Install NVIDIA Drivers</div>
+        <div class="step-desc">Lets your RTX 4060 Ti work inside Docker containers</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <div class="alert alert-warn">
+        <span class="alert-icon">⚠️</span>
+        <div class="alert-body">
+          <strong>Install the Windows driver only.</strong>
+          Do NOT install CUDA separately inside WSL2 — the Windows driver handles it automatically.
+        </div>
+      </div>
+
+      <p>1. Go to <strong>nvidia.com/Download/index.aspx</strong></p>
+      <p>2. Select: Product Type = <strong>GeForce</strong>, Series = <strong>RTX 40</strong>, GPU = <strong>RTX 4060 Ti</strong>, OS = <strong>Windows 11</strong></p>
+      <p>3. Download and install the latest driver.</p>
+      <p>4. After install, open Ubuntu (WSL2) and verify your GPU is visible:</p>
+
+      <div class="code-block">
+        <div class="code-label">Ubuntu (WSL2) Terminal <button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <pre>nvidia-smi</pre>
+      </div>
+
+      <p>You should see your RTX 4060 Ti listed with 8192MB VRAM. If you see it — great, move on.</p>
+
+      <ul class="checklist">
+        <li><div class="check-box" onclick="toggleCheck(this, 4)"></div> Downloaded and installed latest NVIDIA driver</li>
+        <li><div class="check-box" onclick="toggleCheck(this, 4)"></div> <code>nvidia-smi</code> in Ubuntu shows RTX 4060 Ti</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ── STEP 5 ── -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num" id="sn-5">5</div>
+      <div>
+        <div class="step-title">Install Docker Desktop</div>
+        <div class="step-desc">The container runtime that runs the bot</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>1. Download Docker Desktop from <strong>docker.com/products/docker-desktop</strong></p>
+      <p>2. During install, make sure <strong>"Use WSL 2 instead of Hyper-V"</strong> is checked ✅</p>
+      <p>3. After install, open Docker Desktop → <strong>Settings → Resources → WSL Integration</strong> → toggle on your Ubuntu distro ✅</p>
+      <p>4. Verify in Ubuntu terminal:</p>
+
+      <div class="code-block">
+        <div class="code-label">Ubuntu (WSL2) Terminal <button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <pre>docker run --rm hello-world</pre>
+      </div>
+
+      <p>You should see "Hello from Docker!" — that means Docker is working inside WSL2.</p>
+
+      <ul class="checklist">
+        <li><div class="check-box" onclick="toggleCheck(this, 5)"></div> Docker Desktop installed</li>
+        <li><div class="check-box" onclick="toggleCheck(this, 5)"></div> WSL Integration enabled for Ubuntu in Docker settings</li>
+        <li><div class="check-box" onclick="toggleCheck(this, 5)"></div> <code>docker run hello-world</code> succeeds</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ── STEP 6 ── -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num" id="sn-6">6</div>
+      <div>
+        <div class="step-title">Set Up the Bot</div>
+        <div class="step-desc">Extract files, add API keys, configure</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>Open your Ubuntu terminal. Copy the project from Windows into WSL2's filesystem (faster than running from <code>/mnt/c/</code>):</p>
+
+      <div class="code-block">
+        <div class="code-label">Ubuntu (WSL2) Terminal <button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="c-comment"># Copy from your Windows Downloads folder into WSL2 home</span>
+cp /mnt/c/Users/$USER/Downloads/kronos-bot.tar.gz ~/
+cd ~
+tar -xzf kronos-bot.tar.gz
+cd kronos-bot
+
+<span class="c-comment"># Create your .env file with Binance API keys</span>
+cp .env.example .env
+nano .env</pre>
+      </div>
+
+      <p>In the nano editor, replace the placeholder values:</p>
+
+      <div class="code-block">
+        <div class="code-label">.env file <button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <pre>BINANCE_API_KEY=<span class="c-string">paste_your_key_here</span>
+BINANCE_API_SECRET=<span class="c-string">paste_your_secret_here</span></pre>
+      </div>
+
+      <p>Press <strong>Ctrl+X</strong>, then <strong>Y</strong>, then <strong>Enter</strong> to save.</p>
+
+      <div class="alert alert-warn">
+        <span class="alert-icon">⚠️</span>
+        <div class="alert-body">
+          <strong>Test on Binance Testnet first!</strong>
+          Open <code>config/config.json</code> and set <code>"testnet": true</code>. Get free testnet keys from testnet.binance.vision. Run for a day before switching to real money.
+        </div>
+      </div>
+
+      <ul class="checklist">
+        <li><div class="check-box" onclick="toggleCheck(this, 6)"></div> Extracted kronos-bot into WSL2 home directory</li>
+        <li><div class="check-box" onclick="toggleCheck(this, 6)"></div> Created .env with Binance API keys</li>
+        <li><div class="check-box" onclick="toggleCheck(this, 6)"></div> Set <code>"testnet": true</code> in config/config.json for initial testing</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ── STEP 7 ── -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num" id="sn-7">7</div>
+      <div>
+        <div class="step-title">Build &amp; Launch</div>
+        <div class="step-desc">First build takes ~15 min — downloads Kronos AI model</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <div class="code-block">
+        <div class="code-label">Ubuntu (WSL2) Terminal <button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="c-comment"># Build the Docker image (first time only — downloads ~4GB)</span>
+docker compose build
+
+<span class="c-comment"># Start the bot in background</span>
+docker compose up -d
+
+<span class="c-comment"># Watch logs to confirm it started</span>
+docker compose logs -f
+
+<span class="c-comment"># Confirm GPU is being used</span>
+docker compose logs | grep -i "cuda\|gpu\|device"</pre>
+      </div>
+
+      <div class="alert alert-success">
+        <span class="alert-icon">✅</span>
+        <div class="alert-body">
+          <strong>Dashboard is live at http://localhost:8080</strong>
+          Open this in your Windows browser once the bot starts.
+        </div>
+      </div>
+
+      <ul class="checklist">
+        <li><div class="check-box" onclick="toggleCheck(this, 7)"></div> <code>docker compose build</code> completed</li>
+        <li><div class="check-box" onclick="toggleCheck(this, 7)"></div> <code>docker compose up -d</code> started successfully</li>
+        <li><div class="check-box" onclick="toggleCheck(this, 7)"></div> Dashboard visible at http://localhost:8080</li>
+        <li><div class="check-box" onclick="toggleCheck(this, 7)"></div> Logs show CUDA device being used</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ── STEP 8 ── -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num" id="sn-8">8</div>
+      <div>
+        <div class="step-title">Go Live</div>
+        <div class="step-desc">Switch from testnet to real trading once you're satisfied</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <div class="code-block">
+        <div class="code-label">Ubuntu (WSL2) Terminal <button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="c-comment"># Edit config — flip testnet to false, update .env with real keys</span>
+nano config/config.json   <span class="c-comment"># set "testnet": false</span>
+nano .env                 <span class="c-comment"># swap in your real Binance API keys</span>
+
+<span class="c-comment"># Restart bot with new config</span>
+docker compose down
+docker compose up -d</pre>
+      </div>
+
+      <hr>
+
+      <p><strong>Day-to-day commands:</strong></p>
+
+      <div class="code-block">
+        <div class="code-label">Common Commands <button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <pre>docker compose up -d        <span class="c-comment"># start bot</span>
+docker compose stop         <span class="c-comment"># pause (keeps position state)</span>
+docker compose logs -f      <span class="c-comment"># live log stream</span>
+docker compose down         <span class="c-comment"># stop + remove container</span>
+docker compose restart      <span class="c-comment"># restart after config changes</span></pre>
+      </div>
+
+      <ul class="checklist">
+        <li><div class="check-box" onclick="toggleCheck(this, 8)"></div> Tested on testnet for at least 1 day</li>
+        <li><div class="check-box" onclick="toggleCheck(this, 8)"></div> Deposited 200 AUD → confirmed as USDT balance on Binance</li>
+        <li><div class="check-box" onclick="toggleCheck(this, 8)"></div> Set <code>"testnet": false</code> and swapped in real API keys</li>
+        <li><div class="check-box" onclick="toggleCheck(this, 8)"></div> Bot restarted, dashboard shows real balance</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  let checkStates = {};
+  let totalChecks = 0;
+  let checkedCount = 0;
+
+  function toggleCheck(el, step) {
+    const id = el.parentElement.textContent.trim().slice(0, 30);
+    const isChecked = el.classList.toggle('checked');
+    el.textContent = isChecked ? '✓' : '';
+    updateProgress();
+  }
+
+  function updateProgress() {
+    const all = document.querySelectorAll('.check-box');
+    const checked = document.querySelectorAll('.check-box.checked');
+    const pct = Math.round(checked.length / all.length * 100);
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('progress-pct').textContent = pct + '%';
+  }
+
+  function copyCode(btn) {
+    const pre = btn.closest('.code-block').querySelector('pre');
+    navigator.clipboard.writeText(pre.innerText).then(() => {
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = 'Copy';
+        btn.classList.remove('copied');
+      }, 2000);
+    });
+  }
+
+  updateProgress();
+</script>
+</body>
+</html>

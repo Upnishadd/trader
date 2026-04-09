@@ -1,0 +1,15 @@
+# ── Kronos model deps ────────────────────────────────────────────────────────
+numpy
+pandas==2.2.2
+torch>=2.0.0
+einops==0.8.1
+huggingface_hub==0.33.1
+matplotlib==3.9.3
+tqdm==4.67.1
+safetensors==0.6.2
+
+# ── Bot & API deps ────────────────────────────────────────────────────────────
+python-binance==1.0.19
+flask==3.1.0
+flask-cors==5.0.0
+requests==2.32.3

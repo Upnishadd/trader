@@ -1,0 +1,36 @@
+version: "3.9"
+
+services:
+  kronos-bot:
+    build: .
+    container_name: kronos-trader
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      # ── REQUIRED: Set these in a .env file (never commit to git) ──
+      - BINANCE_API_KEY=${BINANCE_API_KEY}
+      - BINANCE_API_SECRET=${BINANCE_API_SECRET}
+      # Tell PyTorch to use CUDA
+      - CUDA_VISIBLE_DEVICES=0
+    volumes:
+      # Persist trade state and logs across container restarts
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./config:/app/config
+    # ── NVIDIA GPU passthrough ──────────────────────────────────────
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+        limits:
+          memory: 6G
+          cpus: "4.0"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "5"
