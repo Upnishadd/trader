@@ -8,7 +8,7 @@
     "max_position_pct": 0.30,
     "stop_loss_pct": 0.02,
     "take_profit_pct": 0.04,
-    "min_confidence": 0.50,
+    "min_confidence": 0.25,
     "max_daily_loss_pct": 0.05
   }
 }

@@ -8,6 +8,7 @@ import time
 import json
 import logging
 import threading
+import traceback
 from datetime import datetime, timezone
 from typing import Optional
 import pandas as pd
@@ -30,21 +31,21 @@ class KronosSignalGenerator:
         self._load_model()
 
     def _load_model(self):
-        if not self.use_model:
+    	if not self.use_model:
             logger.info("Model disabled — using momentum fallback strategy")
             return
-        try:
+    	try:
             from model import Kronos, KronosTokenizer, KronosPredictor
             logger.info("Loading Kronos tokenizer...")
             self.tokenizer = KronosTokenizer.from_pretrained("NeoQuasar/Kronos-Tokenizer-base")
             logger.info("Loading Kronos-small model...")
-            self.model = Kronos.from_pretrained("NeoQuasar/Kronos-small")
+            self.model = Kronos.from_pretrained("NeoQuasar/Kronos-base")
             self.predictor = KronosPredictor(self.model, self.tokenizer, max_context=512)
             logger.info("Kronos model loaded successfully")
-        except Exception as e:
+    	except Exception as e:
             logger.warning(f"Kronos model unavailable ({e}) — falling back to momentum strategy")
+            traceback.print_exc()  # <-- Print full error
             self.predictor = None
-
     def generate_signal(self, df: pd.DataFrame, symbol: str, pred_len: int = 12) -> dict:
         """
         Generate a trading signal from recent OHLCV data.
