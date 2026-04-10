@@ -106,4 +106,4 @@ def emit_signal(signal: dict):
 
 def run_server(host="0.0.0.0", port=8080):
     logger.info(f"Dashboard server starting on {host}:{port}")
-    socketio.run(app, host=host, port=port, debug=False)
+    socketio.run(app, host=host, port=port, debug=False, allow_unsafe_werkzeug=True)
