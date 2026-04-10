@@ -296,6 +296,8 @@ class TradingBot:
 
         self.position = None   # {"qty": float, "entry_price": float, "entry_time": str}
         self.trade_history = []
+        self._last_balance = 0.0
+        self._last_price = 0.0
         self.state_file = "/app/data/state.json"
         self._load_state()
 
@@ -382,8 +384,8 @@ class TradingBot:
         """Returns current bot status for dashboard API."""
         with self._lock:
             try:
-                balance_usdt = self.trader.get_balance("USDT")
-                price = self.trader.get_current_price(self.symbol)
+                balance_usdt = self._last_balance
+                price = self._last_price
                 position_value = 0.0
                 unrealized_pnl = 0.0
                 if self.position:
@@ -418,6 +420,7 @@ class TradingBot:
         logger.info(f"--- Tick {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')} ---")
         df = self.trader.get_klines(self.symbol, self.interval, limit=500)
         current_price = float(df['close'].iloc[-1])
+        self._last_price = current_price
 
         # Check stop-loss / take-profit first
         exit_reason = self._check_stop_loss_take_profit(current_price)
@@ -430,6 +433,7 @@ class TradingBot:
         logger.info(f"Signal: {signal['signal']} | Confidence: {signal['confidence']:.2f} | Method: {signal['method']}")
 
         balance_usdt = self.trader.get_balance("USDT")
+        self._last_balance = balance_usdt
         logger.info(f"Balance: ${balance_usdt:.2f} USDT | Position: {self.position}")
 
         if signal["signal"] == "BUY" and self.position is None:

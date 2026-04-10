@@ -9,7 +9,8 @@ import logging
 import threading
 
 # Add project root to path
-sys.path.insert(0, "/app")
+if "/app" not in sys.path:
+    sys.path.insert(0, "/app")
 
 logging.basicConfig(
     level=logging.INFO,
@@ -40,8 +41,9 @@ def main():
     from bot.dashboard_api import app, run_server
     import bot.dashboard_api as api_module
 
-    # Initialize bot
-    bot = TradingBot(config_path="/app/config/config.json")
+    # Initialize bot with Docker-standard path
+    config_path = "/app/config/config.json"
+    bot = TradingBot(config_path=config_path)
     api_module.bot_instance = bot
 
     # Start dashboard server in background thread

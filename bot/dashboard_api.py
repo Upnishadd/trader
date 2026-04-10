@@ -15,16 +15,20 @@ from flask_socketio import SocketIO
 
 logger = logging.getLogger("DashboardAPI")
 
-app = Flask(__name__, static_folder="/app/dashboard/static")
+# Use absolute path based on the project root in Docker
+BASE_DIR = "/app"
+STATIC_FOLDER = os.path.join(BASE_DIR, "dashboard", "static")
+
+app = Flask(__name__, static_folder=STATIC_FOLDER)
 CORS(app)
-socketio = SocketIO(app, cors_allowed_origins="*")  # <-- enable WebSockets
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
 
 bot_instance = None  # Set by main.py
 
 
 @app.route("/")
 def index():
-    return send_from_directory("/app/dashboard/static", "index.html")
+    return send_from_directory(STATIC_FOLDER, "index.html")
 
 
 @app.route("/api/status")
