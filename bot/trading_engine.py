@@ -161,6 +161,7 @@ class RiskManager:
         self.max_daily_loss_pct = config.get("max_daily_loss_pct", 0.05) # 5% daily loss limit
         self.daily_loss = 0.0
         self.daily_reset_date = datetime.now(timezone.utc).date()
+        self.min_notional = 5.0  # Default, updated by TradingBot
 
     def reset_daily_if_needed(self):
         today = datetime.now(timezone.utc).date()
@@ -176,7 +177,7 @@ class RiskManager:
         if self.daily_loss >= self.max_daily_loss_pct * balance_usdt:
             logger.warning("Daily loss limit reached — no new trades today")
             return False
-        if balance_usdt < 5.0:
+        if balance_usdt < self.min_notional:
             logger.warning(f"Balance too low: ${balance_usdt:.2f} USDT")
             return False
         return True
@@ -185,7 +186,7 @@ class RiskManager:
         """Size position based on confidence and risk limits."""
         base_size = balance_usdt * self.max_position_pct
         sized = base_size * confidence
-        return max(5.0, min(sized, balance_usdt * self.max_position_pct))
+        return max(self.min_notional, min(sized, balance_usdt * self.max_position_pct))
 
     def record_loss(self, amount: float):
         self.daily_loss += abs(amount)
@@ -293,6 +294,14 @@ class TradingBot:
         use_model = self.config.get("use_kronos_model", True)
         self.signal_gen = KronosSignalGenerator(use_model=use_model)
         self.risk = RiskManager(self.config.get("risk", {}))
+
+        # Initialize min_notional from Binance
+        try:
+            symbol_info = self.trader.get_symbol_info(self.symbol)
+            self.risk.min_notional = symbol_info.get("min_notional", 5.0)
+            logger.info(f"RiskManager min_notional set to {self.risk.min_notional}")
+        except Exception as e:
+            logger.warning(f"Could not fetch min_notional from Binance, using default: {e}")
 
         self.position = None   # {"qty": float, "entry_price": float, "entry_time": str}
         self.trade_history = []
