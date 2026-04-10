@@ -162,6 +162,7 @@ class RiskManager:
         self.daily_loss = 0.0
         self.daily_reset_date = datetime.now(timezone.utc).date()
         self.min_notional = 5.0  # Default, updated by TradingBot
+        self.fee_buffer = 0.002  # 0.2% buffer to cover Binance fees (0.1%) and slippage
 
     def reset_daily_if_needed(self):
         today = datetime.now(timezone.utc).date()
@@ -184,9 +185,11 @@ class RiskManager:
 
     def position_size_usdt(self, balance_usdt: float, confidence: float) -> float:
         """Size position based on confidence and risk limits."""
-        base_size = balance_usdt * self.max_position_pct
+        # Apply a fee buffer so we don't exceed available balance
+        usable_balance = balance_usdt * (1 - self.fee_buffer)
+        base_size = usable_balance * self.max_position_pct
         sized = base_size * confidence
-        return max(self.min_notional, min(sized, balance_usdt * self.max_position_pct))
+        return max(self.min_notional, min(sized, usable_balance * self.max_position_pct))
 
     def record_loss(self, amount: float):
         self.daily_loss += abs(amount)
@@ -427,30 +430,34 @@ class TradingBot:
 
     def _tick(self):
         logger.info(f"--- Tick {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')} ---")
-        df = self.trader.get_klines(self.symbol, self.interval, limit=500)
-        current_price = float(df['close'].iloc[-1])
-        self._last_price = current_price
+        try:
+            df = self.trader.get_klines(self.symbol, self.interval, limit=500)
+            current_price = float(df['close'].iloc[-1])
+            self._last_price = current_price
 
-        # Check stop-loss / take-profit first
-        exit_reason = self._check_stop_loss_take_profit(current_price)
-        if exit_reason:
-            logger.info(f"Triggered: {exit_reason} at ${current_price:.2f}")
-            self._execute_sell(reason=exit_reason)
-            return
+            # Check stop-loss / take-profit first
+            exit_reason = self._check_stop_loss_take_profit(current_price)
+            if exit_reason:
+                logger.info(f"Triggered: {exit_reason} at ${current_price:.2f}")
+                self._execute_sell(reason=exit_reason)
+                return
 
-        signal = self.signal_gen.generate_signal(df, self.symbol)
-        logger.info(f"Signal: {signal['signal']} | Confidence: {signal['confidence']:.2f} | Method: {signal['method']}")
+            signal = self.signal_gen.generate_signal(df, self.symbol)
+            logger.info(f"Signal: {signal['signal']} | Confidence: {signal['confidence']:.2f} | Method: {signal['method']}")
 
-        balance_usdt = self.trader.get_balance("USDT")
-        self._last_balance = balance_usdt
-        logger.info(f"Balance: ${balance_usdt:.2f} USDT | Position: {self.position}")
+            balance_usdt = self.trader.get_balance("USDT")
+            self._last_balance = balance_usdt
+            logger.info(f"Balance: ${balance_usdt:.2f} USDT | Position: {self.position}")
 
-        if signal["signal"] == "BUY" and self.position is None:
-            if self.risk.can_trade(signal, balance_usdt):
-                self._execute_buy(signal, balance_usdt)
+            if signal["signal"] == "BUY" and self.position is None:
+                if self.risk.can_trade(signal, balance_usdt):
+                    self._execute_buy(signal, balance_usdt)
 
-        elif signal["signal"] == "SELL" and self.position is not None:
-            self._execute_sell(reason="signal")
+            elif signal["signal"] == "SELL" and self.position is not None:
+                self._execute_sell(reason="signal")
+        except Exception as e:
+            logger.error(f"Error during tick execution: {e}")
+            # Do not stop the bot, just wait for the next interval
 
     def start(self):
         self.thread = threading.Thread(target=self.loop, daemon=True)
