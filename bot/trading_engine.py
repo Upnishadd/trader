@@ -31,10 +31,10 @@ class KronosSignalGenerator:
         self._load_model()
 
     def _load_model(self):
-    	if not self.use_model:
+        if not self.use_model:
             logger.info("Model disabled — using momentum fallback strategy")
             return
-    	try:
+        try:
             from model import Kronos, KronosTokenizer, KronosPredictor
             logger.info("Loading Kronos tokenizer...")
             self.tokenizer = KronosTokenizer.from_pretrained("NeoQuasar/Kronos-Tokenizer-base")
@@ -42,7 +42,7 @@ class KronosSignalGenerator:
             self.model = Kronos.from_pretrained("NeoQuasar/Kronos-base")
             self.predictor = KronosPredictor(self.model, self.tokenizer, max_context=512)
             logger.info("Kronos model loaded successfully")
-    	except Exception as e:
+        except Exception as e:
             logger.warning(f"Kronos model unavailable ({e}) — falling back to momentum strategy")
             traceback.print_exc()  # <-- Print full error
             self.predictor = None
@@ -424,8 +424,8 @@ class TradingBot:
                     "position_value": position_value,
                     "unrealized_pnl": unrealized_pnl,
                     "trade_history": self.trade_history[-50:],
-                    "timestamp": datetime.now(timezone.utc).isoformat()
-                    "actual_asset_balance": self._last_asset_balance,
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                    "actual_asset_balance": self._last_asset_balance
                 }
             except Exception as e:
                 return {"error": str(e), "running": self.running}
