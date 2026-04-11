@@ -1,6 +1,6 @@
 {
   "symbol": "SOLUSDT",
-  "interval": "1m",
+  "interval": "5m",
   "loop_interval_seconds": 60,
   "testnet": false,
   "use_kronos_model": true,
