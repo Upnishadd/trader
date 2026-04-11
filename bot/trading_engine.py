@@ -85,12 +85,12 @@ class KronosSignalGenerator:
             forecast_close = float(pred_df['close'].iloc[-1])
             pct_change = (forecast_close - current_close) / current_close * 100
 
-            if pct_change > 0.3:
+            if pct_change > 0.05:
                 signal = "BUY"
-                confidence = min(abs(pct_change) / 2.0, 1.0)
-            elif pct_change < -0.3:
+                confidence = min(abs(pct_change) / 0.1, 1.0)
+            elif pct_change < -0.05:
                 signal = "SELL"
-                confidence = min(abs(pct_change) / 2.0, 1.0)
+                confidence = min(abs(pct_change) / 0.1, 1.0)
             else:
                 signal = "HOLD"
                 confidence = 0.3
@@ -443,7 +443,7 @@ class TradingBot:
                 return
 
             signal = self.signal_gen.generate_signal(df, self.symbol)
-            logger.info(f"Signal: {signal['signal']} | Confidence: {signal['confidence']:.2f} | Method: {signal['method']}")
+            logger.info(f"Signal: {signal['signal']} | Confidence: {signal['confidence']:.2f} | Method: {signal['method']} | PctChange: {signal.get('pct_change', 'N/A')}")
 
             balance_usdt = self.trader.get_balance("USDT")
             self._last_balance = balance_usdt
