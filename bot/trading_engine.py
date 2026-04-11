@@ -310,6 +310,7 @@ class TradingBot:
         self.trade_history = []
         self._last_balance = 0.0
         self._last_price = 0.0
+        self._last_asset_balance = 0.0
         self.state_file = "/app/data/state.json"
         self._load_state()
 
@@ -352,8 +353,9 @@ class TradingBot:
         size_usdt = self.risk.position_size_usdt(balance_usdt, signal["confidence"])
         order = self.trader.place_market_buy(self.symbol, size_usdt)
         if order:
-            price = self.trader.get_current_price(self.symbol)
-            qty = float(order.get('executedQty', 0))
+            # Use the actual quantity filled by Binance (after fees)
+            qty = sum(float(fill['qty']) for fill in order.get('fills', []))
+            price = sum(float(fill['price']) * float(fill['qty']) for fill in order.get('fills', [])) / qty if qty > 0 else self.trader.get_current_price(self.symbol)
             self.position = {
                 "qty": qty,
                 "entry_price": price,
@@ -366,7 +368,16 @@ class TradingBot:
     def _execute_sell(self, reason: str = "signal"):
         if not self.position:
             return
-        qty = self.position["qty"]
+
+        # Get actual asset balance from Binance to avoid "Insufficient Balance" errors due to fees/rounding
+        asset = self.symbol.replace("USDT", "")
+        actual_balance = self.trader.get_balance(asset)
+        qty = min(self.position["qty"], actual_balance)
+        
+        # Ensure we meet the exchange's step size requirements
+        info = self.trader.get_symbol_info(self.symbol)
+        qty = self.trader.round_qty(qty, info['step_size'])
+
         order = self.trader.place_market_sell(self.symbol, qty)
         if order:
             price = self.trader.get_current_price(self.symbol)
@@ -406,6 +417,7 @@ class TradingBot:
                 return {
                     "running": self.running,
                     "symbol": self.symbol,
+                    "asset_name": self.symbol.replace("USDT", ""),
                     "current_price": price,
                     "balance_usdt": balance_usdt,
                     "position": self.position,
@@ -413,6 +425,7 @@ class TradingBot:
                     "unrealized_pnl": unrealized_pnl,
                     "trade_history": self.trade_history[-50:],
                     "timestamp": datetime.now(timezone.utc).isoformat()
+                    "actual_asset_balance": self._last_asset_balance,
                 }
             except Exception as e:
                 return {"error": str(e), "running": self.running}
@@ -447,6 +460,9 @@ class TradingBot:
 
             balance_usdt = self.trader.get_balance("USDT")
             self._last_balance = balance_usdt
+            
+            asset = self.symbol.replace("USDT", "")
+            self._last_asset_balance = self.trader.get_balance(asset)
             logger.info(f"Balance: ${balance_usdt:.2f} USDT | Position: {self.position}")
 
             if signal["signal"] == "BUY" and self.position is None:

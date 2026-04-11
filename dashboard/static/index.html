@@ -470,7 +470,7 @@ async function updateStatus() {
       pnls.length > 0 ? `${(wins/pnls.length*100).toFixed(0)}% win rate` : 'No closed trades';
     document.getElementById('trade-count').textContent = `${trades.length} trades`;
 
-    renderPosition(d.position, price, d.symbol);
+    renderPosition(d.position, price, d.symbol, d.actual_asset_balance, d.asset_name);
     renderTrades(trades);
     document.getElementById('last-update').textContent = 'Updated ' + new Date().toLocaleTimeString('en-AU');
 
@@ -481,17 +481,22 @@ async function updateStatus() {
   }
 }
 
-function renderPosition(pos, price, symbol) {
+function renderPosition(pos, price, symbol, actualAssetBalance, assetName) {
   const el = document.getElementById('position-body');
   if (!pos) { el.innerHTML = '<div class="position-empty">⬜ No open position</div>'; return; }
 
   const pnl = (price - pos.entry_price) * pos.qty;
   const pct = ((price - pos.entry_price) / pos.entry_price * 100).toFixed(3);
   const col = pnl >= 0 ? 'var(--green)' : 'var(--red)';
+  
+  // Highlight if there is a discrepancy (dust/fee issue)
+  const discrepancy = Math.abs(pos.qty - actualAssetBalance) > 0.00001;
+  const actualCol = discrepancy ? 'var(--yellow)' : 'var(--text)';
 
   el.innerHTML = `
     <div class="position-row"><span class="pos-label">Symbol</span><span class="pos-value">${symbol}</span></div>
-    <div class="position-row"><span class="pos-label">Quantity</span><span class="pos-value">${parseFloat(pos.qty).toFixed(4)}</span></div>
+    <div class="position-row"><span class="pos-label">Tracked Qty</span><span class="pos-value">${parseFloat(pos.qty).toFixed(6)}</span></div>
+    <div class="position-row"><span class="pos-label">Exchange Balance</span><span class="pos-value" style="color:${actualCol}">${parseFloat(actualAssetBalance || 0).toFixed(6)} ${assetName}</span></div>
     <div class="position-row"><span class="pos-label">Entry Price</span><span class="pos-value">${fmtPrice(pos.entry_price)}</span></div>
     <div class="position-row"><span class="pos-label">Live Price</span><span class="pos-value" style="color:var(--accent)">${fmtPrice(price)}</span></div>
     <div class="position-row"><span class="pos-label">Unrealised P&L</span><span class="pos-value" style="color:${col}">${pnl>=0?'+':''}${fmtPrice(pnl,4)} (${pct}%)</span></div>
